@@ -15,7 +15,9 @@ img {
 
 .slide {
   display: flex;
+  transform: translate3d(-1445.5px,0,0);
 }
+
 .slide li {
   flex-shrink: 0;
   width: 80vw;
