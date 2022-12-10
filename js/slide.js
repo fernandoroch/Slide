@@ -1,3 +1,5 @@
+import debounce from './debounce.js'
+
 export default class Slide {
   constructor(slide, warpper) {
     this.slide = document.querySelector(slide);
@@ -7,10 +9,11 @@ export default class Slide {
       startX: 0,
       movement: 0,
     };
+    this.activeClass = "active";
   }
 
-  transition(active){
-    this.slide.style.transition = active ? 'transform .3s' : ''
+  transition(active) {
+    this.slide.style.transition = active ? "transform .3s" : "";
   }
 
   moveSlide(distanciaX) {
@@ -34,7 +37,7 @@ export default class Slide {
       movetype = "touchmove";
     }
     this.warpper.addEventListener(movetype, this.onMove);
-    this.transition(false)
+    this.transition(false);
   }
 
   onMove(event) {
@@ -50,19 +53,21 @@ export default class Slide {
     const movetype = event.type === "mouseup" ? "mousemove" : "touchmove";
     this.warpper.removeEventListener(movetype, this.onMove);
     this.distancia.finalPosition = this.distancia.movePosition;
-    this.transition(true)
-    this.changeSlideOnEnd()
+    this.transition(true);
+    this.changeSlideOnEnd();
   }
 
-  changeSlideOnEnd(){
+  changeSlideOnEnd() {
     if (this.distancia.movement > 120 && this.index.next !== undefined) {
-      this.activeNextSlide()
-    }else if (this.distancia.movement < -120 && this.index.prev !== undefined) {
-      this.activePrevSlide()
-    }else {
-      this.changeSlide(this.index.active)
+      this.activeNextSlide();
+    } else if (
+      this.distancia.movement < -120 &&
+      this.index.prev !== undefined
+    ) {
+      this.activePrevSlide();
+    } else {
+      this.changeSlide(this.index.active);
     }
-    console.log(this.distancia.movement);
   }
 
   addSlideEvent() {
@@ -70,12 +75,6 @@ export default class Slide {
     this.warpper.addEventListener("touchstart", this.onStart);
     this.warpper.addEventListener("mouseup", this.onEnd);
     this.warpper.addEventListener("touchend", this.onEnd);
-  }
-
-  bindEvents() {
-    this.onStart = this.onStart.bind(this);
-    this.onMove = this.onMove.bind(this);
-    this.onEnd = this.onEnd.bind(this);
   }
 
   // slides config
@@ -93,35 +92,61 @@ export default class Slide {
   }
 
   slideIndexNav(index) {
-    const last = this.slideArray.length - 1
+    const last = this.slideArray.length - 1;
     this.index = {
-      prev: (index)? index - 1 : undefined,
+      prev: index ? index - 1 : undefined,
       active: index,
-      next: (index === last)? undefined : index + 1,
+      next: index === last ? undefined : index + 1,
     };
   }
 
   changeSlide(index) {
-    const activeSlide = this.slideArray[index]
+    const activeSlide = this.slideArray[index];
     this.moveSlide(activeSlide.position);
     this.slideIndexNav(index);
-    console.log(this.index );
-    this.distancia.finalPosition = activeSlide.position
+    this.distancia.finalPosition = activeSlide.position;
+    this.changeActiveClass();
   }
 
-  activePrevSlide(){
-    if (this.index.prev !== undefined) this.changeSlide(this.index.prev)
+  changeActiveClass() {
+    this.slideArray.forEach((item) =>
+      item.elemnet.classList.remove(this.activeClass)
+    );
+    this.slideArray[this.index.active].elemnet.classList.add(this.activeClass);
   }
 
-  activeNextSlide(){
-    if (this.index.next !== undefined) this.changeSlide(this.index.next)
+  activePrevSlide() {
+    if (this.index.prev !== undefined) this.changeSlide(this.index.prev);
+  }
+
+  activeNextSlide() {
+    if (this.index.next !== undefined) this.changeSlide(this.index.next);
+  }
+
+  onResize() {
+    setTimeout(() => {
+      this.slidesconfig();
+      this.changeSlide(this.index.active);
+    }, 1000);
+  }
+
+  addResizeEvent() {
+    window.addEventListener("resize", this.onResize);
+  }
+
+  bindEvents() {
+    this.onStart = this.onStart.bind(this);
+    this.onMove = this.onMove.bind(this);
+    this.onEnd = this.onEnd.bind(this);
+    this.onResize = debounce(this.onResize.bind(this),200);
   }
 
   init() {
     this.bindEvents();
-    this.transition(true)
+    this.transition(true);
     this.addSlideEvent();
     this.slidesconfig();
+    this.addResizeEvent();
     return this;
   }
 }
