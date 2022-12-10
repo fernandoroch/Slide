@@ -6,4 +6,3 @@ slide.init()
 slide.changeSlide(3)
 slide.activePrevSlide()
 
-console.log(slide);
