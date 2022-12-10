@@ -17,10 +17,25 @@ img {
   display: flex;
   transform: translate3d(-1445.5px,0,0);
 }
+.slide:hover {
+  will-change: transform;
+}
 
 .slide li {
   flex-shrink: 0;
   width: 80vw;
   max-width: 800px;
   margin: 50px 20px;
+
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, .4);
+  opacity: .8;
+  transform: scale(.8);
+  transition: .3s;
+}
+
+.slide li.active {
+  opacity: 1;
+  transform: scale(1);
 }
