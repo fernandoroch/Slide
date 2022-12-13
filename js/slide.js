@@ -198,7 +198,7 @@ export default class Slide {
     this.slidesconfig();
     this.addResizeEvent();
     this.addArrow();
-    this. addControl();
+    this. addControl('.custom-controls');
     
     return this;
   }
