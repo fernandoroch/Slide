@@ -1,4 +1,4 @@
-import debounce from './debounce.js'
+import debounce from "./debounce.js";
 
 export default class Slide {
   constructor(slide, warpper) {
@@ -106,6 +106,7 @@ export default class Slide {
     this.slideIndexNav(index);
     this.distancia.finalPosition = activeSlide.position;
     this.changeActiveClass();
+    this.activeControlItem()
   }
 
   changeActiveClass() {
@@ -124,14 +125,47 @@ export default class Slide {
   }
 
   addArrow() {
-    this.prevElement = document.querySelector('.prev')
-    this.nextElement = document.querySelector('.next')
-    this.addArrowEvents()
+    this.prevElement = document.querySelector(".prev");
+    this.nextElement = document.querySelector(".next");
+    this.addArrowEvents();
   }
 
-  addArrowEvents(){
-    this.prevElement.addEventListener('click',this.activePrevSlide)
-    this.nextElement.addEventListener('click',this.activeNextSlide)
+  addArrowEvents() {
+    this.prevElement.addEventListener("click", this.activePrevSlide);
+    this.nextElement.addEventListener("click", this.activeNextSlide);
+  }
+
+  crateControl() {
+    const control = document.createElement("ul");
+    control.dataset.control = "slide";
+
+    this.slideArray.forEach((item, index) => {
+      control.innerHTML += `<li><a href="#slide${index + 1}">${
+        index + 1
+      }</a></li>`;
+    });
+    this.warpper.appendChild(control)
+    return control
+  }
+
+  eventControl(item, index) {
+    item.addEventListener('click', (event) => {
+      event.preventDefault()
+      this.changeSlide(index)
+      this.activeControlItem()
+    })
+  }
+
+  addControl(custonControl){
+    this.control =  document.querySelector(custonControl) || this.crateControl()
+    this.controlArray = [...this.control.children]
+    this.controlArray.forEach((item, index) => this.eventControl(item, index))
+    
+  }
+
+  activeControlItem() {
+    this.controlArray.forEach((item) => item.classList.remove(this.activeClass))
+    this.controlArray[this.index.active].classList.add(this.activeClass)
   }
 
   onResize() {
@@ -150,10 +184,11 @@ export default class Slide {
     this.onMove = this.onMove.bind(this);
     this.onEnd = this.onEnd.bind(this);
 
-    this.activePrevSlide = this.activePrevSlide.bind(this)
-    this.activeNextSlide = this.activeNextSlide.bind(this)
+    this.activePrevSlide = this.activePrevSlide.bind(this);
+    this.activeNextSlide = this.activeNextSlide.bind(this);
+    this.eventControl = this.eventControl.bind(this)
 
-    this.onResize = debounce(this.onResize.bind(this),200);
+    this.onResize = debounce(this.onResize.bind(this), 200);
   }
 
   init() {
@@ -162,7 +197,9 @@ export default class Slide {
     this.addSlideEvent();
     this.slidesconfig();
     this.addResizeEvent();
-    this.addArrow()
+    this.addArrow();
+    this. addControl();
+    
     return this;
   }
-} 
+}
